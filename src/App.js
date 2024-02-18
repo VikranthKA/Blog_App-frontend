@@ -1,3 +1,4 @@
+import { useReducer } from 'react'
 import {Routes,Route} from 'react-router-dom'
 import {Toaster} from 'react-hot-toast'
 
@@ -12,15 +13,20 @@ import BlogEdit from './Blog-frontEnd/Components/Blog-Post-Components/BlogEdit'
 import CommentForm from './Blog-frontEnd/Components/Comment-Components/CommentForm'
 import Storage from './Blog-frontEnd/Context/Storage'
 import BlogDetails from './Blog-frontEnd/Components/Blog-Post-Components/BlogDetails'
+import postReducer from './Blog-frontEnd/Components/useReducer/postReducer'
+import { profileReducer } from './Blog-frontEnd/Components/useReducer/profileReducer'
+
 
 
 
 
 function App(){
+  const [profileState, profileDispatch] = useReducer(profileReducer, { profileDetails: {} });
+  
+  const [BlogState,postDispatch] = useReducer(postReducer,{Blogs:[]})
   return(
     <div>
       <Storage>
-
       <Header/>
       <Toaster/>
       <Routes>
