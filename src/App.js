@@ -25,7 +25,7 @@ function App(){
   
   const [BlogState,postDispatch] = useReducer(postReducer,{Blogs:[]})
   return(
-    <div>
+    <div style={{width:"100%",height:"100%",margin:" 0 0 0 0",padding:"0 0 0 0"}}>
       <Storage>
       <Header/>
       <Toaster/>
@@ -37,7 +37,7 @@ function App(){
         <Route path="/UserProfile" element={<UserProfile/>}/>
         <Route path="/ListBlogPost" element={<ListBlogPost/>}/>
         <Route path="/MyBlogs" element={<MyBlogs/>}/>
-        <Route path="/CreateNewBlog" element={<PostForm/>}/>
+        <Route path="/create-new-blog" element={<PostForm/>} exact={true}/>
         <Route path="/BlogEdit/:id" element={<BlogEdit/>}/>
         <Route path="/CommentForm/:id" element={<CommentForm/>}/>
         <Route path="/BlogDetails/:postId" element={<BlogDetails/>}/>

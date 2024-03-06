@@ -1,28 +1,28 @@
 import React, { useState, useContext } from 'react';
+import { Button, Typography, Box, Grid, Card, CardContent, CardActions, IconButton } from '@mui/material';
+import { Edit, Delete } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom';
 import { parseISO, differenceInDays } from 'date-fns';
 import { jwtDecode } from 'jwt-decode';
 import Context from '../../Context/Context';
 import PostForm from './PostForm';
 
-function data_fns(date) {
-  const currentData = new Date();
-  const parseDate = parseISO(date);
-  const dateDifference = differenceInDays(currentData, parseDate);
-  return dateDifference;
+const daysSincePosted = (date) => {
+  const diff = Math.abs(new Date() - new Date(date));
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
-export default function BlogCard({ author, categories, image, postId, content, title, createdAt,updatedAt }) {
-  
- 
+export default function BlogCard({ author, categories, image, postId, content, title, createdAt, updatedAt }) {
+
+
   // console.log(categories,"101")
-  const { isLogin,listPost,
-    handleLogin,handleLogout,
-    handleBlogDeleteStorage,handleBlogEditStorage,handleAddBlog,
-    handleCommentDeleteStorage,handleCommentEditStorage,handleCreateComment } = useContext(Context);
+  const { isLogin, listPost,
+    handleLogin, handleLogout,
+    handleBlogDeleteStorage, handleBlogEditStorage, handleAddBlog,
+    handleCommentDeleteStorage, handleCommentEditStorage, handleCreateComment } = useContext(Context);
   const navigate = useNavigate();
   const [toggle, setToggle] = useState(false);
-  const [blogEdit,setBlogEdit] = useState(false)
+  const [blogEdit, setBlogEdit] = useState(false)
 
   const tokendata = localStorage.getItem("token");
   let userId;
@@ -35,21 +35,21 @@ export default function BlogCard({ author, categories, image, postId, content, t
       // console.log(author._id)
     } catch (error) {
       console.error('Error decoding token:', error);
-     }
+    }
   } else {
     console.log('Invalid token or token not present');
-    
+
   }
 
 
-    const handleBlogEdit = () => {
+  const handleBlogEdit = () => {
     // Add your logic for handling blog edit
-      setBlogEdit(true)
+    setBlogEdit(true)
   };
 
   const handleBlogDelete = (postId) => {
     handleBlogDeleteStorage(postId)
-    console.log('Delete blog clicked',postId);
+    console.log('Delete blog clicked', postId);
   };
 
   const handleCommentEdit = (commentId) => {
@@ -62,64 +62,57 @@ export default function BlogCard({ author, categories, image, postId, content, t
     // Add your logic for handling comment delete
     console.log(`Delete comment clicked for comment ID: ${commentId}`);
   };
-  function htmldanger(data){
-    return {__html:data}
+  function htmldanger(data) {
+    return { __html: data }
   }
-  const hanldeBlogEditCancel=()=>{
+  const hanldeBlogEditCancel = () => {
     setBlogEdit(!blogEdit)
   }
 
- 
+
 
   return (
-    <div>
-      <div>
-      {blogEdit ? <><PostForm postId={postId} hanldeBlogEditCancel={hanldeBlogEditCancel}/><br/><button onClick={hanldeBlogEditCancel}>Cancel</button></> :
+    <Box mb={2} ml={"20%"}>
+    {blogEdit ? (
       <>
-      {postId &&
-       tokendata &&
-        userId &&
-        (author._id === userId.id) && 
-        isLogin && 
-        (
-        <div>
-          <button onClick={handleBlogEdit}>Edit</button>
-          <button onClick={()=>handleBlogDelete(postId)}>Delete</button>
-        </div>
-      )}
-      <div>
-        <div>
-          Author is {author.username}
-        </div>
-        <div>
-          <div dangerouslySetInnerHTML={htmldanger(title)} /> 
-          Title:
-          <div>posted: {data_fns(createdAt)} days ago__
-                Last Edited:{data_fns(updatedAt)} days ago
+        <PostForm postId={postId} hanldeBlogEditCancel={hanldeBlogEditCancel} />
+        <Button variant="outlined" onClick={hanldeBlogEditCancel}>Cancel</Button>
+      </>
+    ) : (
+      <Card>
+        <CardContent>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <Typography variant="h4">Title: {title}</Typography>
+            <div>
+              <CardActions disableSpacing>
+                {isLogin && userId && author._id === userId.id && (
+                  <div>
+                    <IconButton onClick={handleBlogEdit}>
+                      <Edit />
+                    </IconButton>
+                    <IconButton onClick={() => handleBlogDelete(postId)}>
+                      <Delete />
+                    </IconButton>
+                   </div>
+                )}
+              </CardActions>
+            </div>
           </div>
-        </div>
-      </div>
+          <Typography variant="h5" >Author: {author.username}</Typography>
+          <Typography variant="h6" >Category: {
+categories[0]?.categoryId.name}</Typography>
 
-      {image && <img src={`http://localhost:3333/Uploads/images/${image}`} alt="ImageLoading"/>}
-      <div>
-        {/* <ul>{categories.categoryId.map((ele) => <li key={ele._id}>{ele.name}</li>)}</ul> */}
-        
-      </div>
-      <div>Description: {}</div>
-      <div dangerouslySetInnerHTML={htmldanger(content)} /> 
-
-      {isLogin && (
-        <div>
-          <p onClick={() => navigate(`/BlogDetails/${postId}`)}>more...</p>
-        </div>
-      )}
-      
-      </>}
-      
-
-      </div>
-      <hr/>
-      
-    </div>
+          <Typography variant="body2">Posted: {daysSincePosted(createdAt)} days ago</Typography>
+          <Typography variant="body2">Last Edited: {daysSincePosted(updatedAt)} days ago</Typography>
+          {image && <img src={`http://localhost:3131/Uploads/images/${image}`} alt="Blog Image" style={{ width: '50%', maxHeight: 200, objectFit: 'cover' }} />}
+          <Typography variant="body1">Description: <div dangerouslySetInnerHTML={htmldanger(content)} style={{display:"inline-block"}} /></Typography>
+        </CardContent>
+        <CardActions>
+          <Button variant="text" onClick={() => navigate(`/BlogDetails/${postId}`)} style={{ marginTop: '3px' }}>More...</Button>
+        </CardActions>
+      </Card>
+    )}
+  </Box>
+  
   );
 }

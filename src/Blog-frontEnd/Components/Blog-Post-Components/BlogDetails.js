@@ -2,6 +2,8 @@ import {useContext,useState,useEffect} from 'react'
 import {useParams} from 'react-router-dom'
 import Context from '../../Context/Context'
 import { parseISO, differenceInDays } from 'date-fns';
+import { Button, Typography, List, ListItem, ListItemText, ListItemSecondaryAction, TextField, Avatar, Grid, IconButton, Box } from '@mui/material';
+import { Delete, Edit } from '@mui/icons-material'
 import BlogEdit from './BlogEdit'
 import CommentForm from '../Comment-Components/CommentForm'
 import CommentCard from '../Comment-Components/CommentCard';
@@ -140,77 +142,85 @@ const handleDeleteComment = async (commentId) => {
     return {__html:data}
   }
 
-  return(
-    <>
-    <div>
-      {postId && isLogin &&(
-        
-       <ul>
-               <li key={post._id}><div>
-                  {(userId===post.author._id) &&
-                      <div>
-                        
-                         <button onClick={()=>handleBlogEdit(postId)}>Edit</button><button onClick={()=>handleBlogDelete(postId)}>Dpostte</button><br/>
-                      </div>
-                  }                               
-                  </div>
-                  Title:<div dangerouslySetInnerHTML={htmldanger(post.title)} />
-                   <br/>
-                  Created At :{(data_fns(post.createdAt))} days ago <br/>
-                  Updated At :{(data_fns(post.updatedAt))}days ago<br/>
-                  {/* {add image to display} */}
-                   {/* {post.author._id} */}
-                  Name :- {post.author.username}  <br/>
-                  e-mail:{post.author.email}<br/>
-                  {post.image && <img src={`http://localhost:3333/Uploads/images/${post.image}`} alt="ImageLoading"/>}
-
-                  Description:-
-
-                <div dangerouslySetInnerHTML={htmldanger(post.content)} /> 
-                  <ul>
-                  {/* {post.categories.map((post)=>{return <li key={post._id}><p>Categories{post.categoryId}</p></li>})} */}
-                  </ul>
-                  <p>Comments</p>
-                  <form onSubmit={handleCommentSubmitPreventDefault}>
-                  <textarea type="text" 
-                        value={submitComment} 
-                        onChange={e=>setSubmitComment(e.target.value)}
-                        placeholder='This is a nice Post'
-                  
-                  /><input type="submit"/><br/>
-                    </form>
-                  <ul>
-                    <div className='EditComment'>
-
-                  {listPostComments && listPostComments.map(ele =>{
-                    return(
-                      
-                      <div key={ele._id}>
-                        <hr/>
-                        {console.log(userId.id)}
-                        {userId.id === ele.author._id && (<div>
-                          <button >Edit</button><button onClick={()=>handleDeleteComment(ele._id)}>Delete</button>
-                        </div>)}
-                        {/* <li> Author:{findName(ele.commentId.author)}</li> */} 
-                        <li>Created:{data_fns(ele.createdAt)}days ago</li>
-                        <li> Updated:{data_fns(ele.updatedAt)}days ago</li>
-                        <li>Comment:-<br/>{ele.comment}</li>
-                      </div>) })}
-                    </div>
-                  </ul>
-                  
-                  
-                  
-                </li>
-                
-                
-       
-       </ul>
-       
+  return (
+    <Box mt={2}>
+      {postId && isLogin && (
+        <List>
+          <ListItem>
+            {userId === post?.author?._id && post && (
+              <ListItemSecondaryAction>
+                <IconButton onClick={() => handleBlogEdit(postId)}>
+                  <Edit />
+                </IconButton>
+                <IconButton onClick={() => handleBlogDelete(postId)}>
+                  <Delete />
+                </IconButton>
+              </ListItemSecondaryAction>
+            )}
+            <ListItemText
+              primary={
+                <Typography variant="h5" dangerouslySetInnerHTML={htmldanger(post?.title)} />
+              }
+              secondary={
+                <Typography variant="body2">
+                  Created At: {data_fns(post?.createdAt)} days ago |
+                  Updated At: {data_fns(post?.updatedAt)} days ago <br />
+                  Name: {post.author.username} | E-mail: {post.author.email}
+                </Typography>
+              }
+            />
+            {post.image && <Avatar src={`http://localhost:3131/Uploads/images/${post.image}`} />}
+          </ListItem>
+          <ListItem>
+            <ListItemText
+              primary={
+                <Typography variant="body1" dangerouslySetInnerHTML={htmldanger(post.content)} />
+              }
+            />
+          </ListItem>
+          <ListItem>
+            <form onSubmit={handleCommentSubmitPreventDefault}>
+              <Grid container spacing={1} alignItems="flex-end">
+                <Grid item>
+                  <TextField
+                    label="Add a comment"
+                    value={submitComment}
+                    onChange={e => setSubmitComment(e.target.value)}
+                  />
+                </Grid>
+                <Grid item>
+                  <Button type="submit">Submit</Button>
+                </Grid>
+              </Grid>
+            </form>
+          </ListItem>
+          {listPostComments && listPostComments.map(ele => (
+            <ListItem key={ele?._id}>
+              <ListItemText
+                primary={
+                  <Typography variant="body2">
+                    Created: {data_fns(ele?.createdAt)} days ago |
+                    Updated: {data_fns(ele?.updatedAt)} days ago
+                  </Typography>
+                }
+                secondary={
+                  <Typography variant="body1" dangerouslySetInnerHTML={htmldanger(ele?.comment)} />
+                }
+              />
+              {userId === ele?.author?._id && (
+                <ListItemSecondaryAction>
+                  <IconButton>
+                    <Edit />
+                  </IconButton>
+                  <IconButton onClick={() => handleDeleteComment(ele?._id)}>
+                    <Delete />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              )}
+            </ListItem>
+          ))}
+        </List>
       )}
-      
-    </div>
-    
-    </>
-    )
+    </Box>
+  );
 } 

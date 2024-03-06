@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../../../config/axios";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -15,7 +15,7 @@ export default function UserProfile() {
   useEffect(() => {
     (async function getData() {
       try {
-        const response = await axios.get("http://localhost:1000/api/users/profile", {
+        const response = await axios.get("/api/users/profile", {
           headers: {
             Authorization: localStorage.getItem("token"),
           },
@@ -50,7 +50,7 @@ export default function UserProfile() {
       try {
         console.log(formdata)
         const response = await axios.put(
-          "http://localhost:1000/api/users/profile",
+          "/api/users/profile",
           formdata,
           {
             headers: {
@@ -61,7 +61,7 @@ export default function UserProfile() {
         console.log(response);
         toast.success("Profile updated successfully", {
           position: "top-center",
-        });
+        })
         setUser(response.data);
       } catch (e) {
         console.log('catch',e);

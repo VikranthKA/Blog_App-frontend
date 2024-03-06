@@ -8,9 +8,37 @@ export default function Storage({children}){
     const [isLogin,setIsLogin] = useState(false)  
     const[listPost,setListPost] = useState([])
     const [comments,setComments] = useState([])
-    const [listPostComments,setListPostComments] = useState([])
-    
+    const [page,setPage] = useState(1)
+    const [totalPage,setTotalPage] = useState(1)
+    const [searchQuery,setSearchQuery] = useState("")
 
+    const [listPostComments,setListPostComments] = useState([])
+    const [useData,setUserData] = useState("")
+    
+    const decodeData = ()=>{
+        const token = localStorage.getItem('token')
+        if(token){
+            const decoded= jwtDecode(token)
+            if(decoded){
+                setIsLogin(true)
+                setUserData(decoded)
+
+            } 
+        }else{
+            setIsLogin(false)
+        }
+        getAllposts()
+    }
+
+    useEffect(()=>{
+
+        decodeData()        
+
+    },[])
+    
+useEffect(()=>{
+    console.log(isLogin)
+},[isLogin])
 
     const navigate = useNavigate
 
@@ -75,35 +103,41 @@ export default function Storage({children}){
 
 
     if(post){
-        const newPostList = [post,...listPost]; // Add the new post to the array
+        const newPostList = [post,...listPost] // Add the new post to the array
         console.log(newPostList);
         setListPost(newPostList);
     }
 
-  };
-  
+  }
 
-  
+  useEffect(()=>{
+    console.log(listPost,"All Post")
+  },[listPost])
 
    async function getAllposts(){
+    let sortBy="title"
+    let order = "desc"
+
+
     try{
-        const response = await axios.get("/api/posts")
-        console.log(response.data)
-        setListPost(response.data)
+        console.log({
+            two:order,
+            three:totalPage,
+            four:sortBy,
+            five:searchQuery,
+        })
+        if(page<=totalPage ){
+            const response = await axios.get(`/api/posts?search=${searchQuery}&sortBy=${sortBy}&order=${order}&page=${page}`)
+            setListPost(response.data.data)
+            setTotalPage(response.data.totalPages)
+        }
 
     }catch(e){
         console.log(e,'error in the Store.js')
 
     }
 }
-    useEffect(()=>{
-        const a = localStorage.getItem('token')
-        if(a){
-            setIsLogin(true)
-        }
-        getAllposts()
-       
-    },[])
+
 
     return(
     <div>
@@ -111,7 +145,11 @@ export default function Storage({children}){
                                     isLogin,listPost,
                                     handleLogin,handleLogout,listPostComments,
                                     handleBlogDeleteStorage,handleBlogEditStorage,handleAddBlog,
-                                    handleCommentEditStorage
+                                    handleCommentEditStorage,decodeData,
+                                    page,setPage,
+                                    totalPage,setTotalPage,
+                                    searchQuery,setSearchQuery,
+                                    getAllposts
                                 }}>
             {children}
         </Context.Provider>

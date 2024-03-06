@@ -2,8 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import Context from '../../Context/Context';
 import { jwtDecode } from 'jwt-decode';
-import BlogMani from './BlogMani';
-
+import BlogCard from './BlogCard';
 export default function MyBlogs() {
   const [toggle, setToggle] = useState(false);
   const { listPost } = useContext(Context);
@@ -26,9 +25,8 @@ export default function MyBlogs() {
           
           console.log(listPost, 'author');
 
-          // Use filter instead of find
-          const userBlogs = listPost.filter((blog) => blog.author._id === userId);
-          console.log(userBlogs)
+          const userBlogs = listPost.filter((blog) => blog.author._id===userId)
+          console.log(userBlogs,"User Blog")
           setMyBlogs(userBlogs);
         }
       } catch (e) {
@@ -41,14 +39,12 @@ export default function MyBlogs() {
 
   return (
     <>
-      {console.log(listPost)}
-      {listPost?.author?._id === userId ? (
+      {userId ? (
         <div>
-          {console.log('in the condition')}
           <ul>
-            {MyBlogs.map((ele) => (
-              <li key={ele._id}>
-                <BlogMani
+            {MyBlogs.map((blog) => (
+              <li key={blog._id}>
+                {/* <BlogMani
                   postId={ele._id}
                   title={ele.title}
                   createdAt={ele.createdAt}
@@ -59,7 +55,22 @@ export default function MyBlogs() {
                   Description={ele.content}
                   categories={ele.categories}
                   comments={ele.comments}
-                />
+                /> */}
+                <BlogCard 
+
+image={blog.image}
+author={blog.author}
+categories={blog.categories}
+//comment no need because of more link
+content={blog.content}
+title={blog.title} 
+createdAt={blog.createdAt}
+
+updatedAt={blog.updatedAt}
+postId={blog._id}
+
+
+/>
               </li>
             ))}
           </ul>
@@ -67,7 +78,7 @@ export default function MyBlogs() {
       ) : (
         <div>
           <h2>
-            U haven't Created a post yet. Give it a try<Link to="CreateNewBlog">Create a Post</Link>
+            U haven't Created a post yet. Give it a try<Link to="/CreateNewBlog">Create a Post</Link>
           </h2>
         </div>
       )}
